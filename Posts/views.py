@@ -6,6 +6,7 @@ from .models import Post
 from drf_api.permissions import IsOwnerOrReadOnly
 from django.http import Http404
 from django.db.models import Count
+from django_filters.rest_framework import DjangoFilterBackend
 
 class PostList(generics.ListCreateAPIView):
     serializer_class = PostSerializer
@@ -13,31 +14,30 @@ class PostList(generics.ListCreateAPIView):
         permissions.IsAuthenticatedOrReadOnly
     ]
     queryset = Post.objects.annotate(
-        comment_count = Count('comment', distinct=True),
-        likes_count = Count('likes', distinct=True),
-    ).order_by('-created_at')
-    filter_backend = [
-        filters.OrderingFilter
-    ]
-    ordering_fields = [
-        'comment_count',
-        'likes_count',
-        'comment__created_at',
-        'likes__created_at',
-    ]
-
-    queryset = Post.objects.annotate(
-        comment_count=Count('comment', distinct=True),
         likes_count=Count('likes', distinct=True),
+        comment_count=Count('comment', distinct=True)
     ).order_by('-created_at')
     filter_backends = [
-        filters.OrderingFilter
+        filters.OrderingFilter,
+        filters.SearchFilter,
+        DjangoFilterBackend,
+    ]
+
+    filterset_fields = [
+        'owner__followed__owner__profile', #show post owner is following
+        'likes__owner__profile', #show posts that are liked by a specific user
+        'owner__profile' #show posts that are owned by a specific user
+    ]
+
+    search_fields = [
+        'owner__username',
+        'title',
     ]
     ordering_fields = [
-        'comment_count',
         'likes_count',
-        'comment__created_at',
+        'comment_count',
         'likes__created_at',
+        'comment__created_at',
     ]
     
     def perform_create(self, serializer):
