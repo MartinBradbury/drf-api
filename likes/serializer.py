@@ -2,7 +2,7 @@ from rest_framework import serializers
 from .models import Like
 from django.db import IntegrityError
 
-class LikesSerializer(serializers.ModelSerializer):
+class LikeSerializer(serializers.ModelSerializer):
     """
     Serializer for the Like model
     The create method handles the unique constraint on 'owner' and 'post'
@@ -21,6 +21,7 @@ class LikesSerializer(serializers.ModelSerializer):
         try:
             return super().create(validated_data)
         except IntegrityError:
-            raise serializer.ValidationError({
+            raise serializers.ValidationError({
                 'detail': 'Possible Duplication'
             })
+
