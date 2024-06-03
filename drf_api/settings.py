@@ -118,6 +118,10 @@ else:
     CORS_ALLOWED_ORIGIN_REGEXES = [
         r'^https://.*\.gitpod\.io$',
     ]
+
+CORS_ORIGIN_WHITELIST = [
+    "https://3000-martinbradb-momentswalk-h21fnkvcxbe.ws-eu114.gitpod.io",
+]
 CORS_ALLOW_CREDENTIALS = True
 
 
